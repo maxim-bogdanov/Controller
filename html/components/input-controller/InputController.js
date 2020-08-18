@@ -33,11 +33,12 @@ class InputController {
         */
         
         Object.keys(actionsToBind).forEach((actionName) => {
+            const actionData = actionsToBind[actionName];
             this.#bindedActions[actionName] = {
                 actionName: actionName,
-                keys: actionsToBind[actionName].keys,
+                keys: actionData.keys,
                 isActive: false,
-                enabled: actionsToBind[actionName].enabled
+                enabled: actionData.enabled === undefined ? true : actionData.enabled
             };
         });
 
@@ -47,8 +48,10 @@ class InputController {
             - isPressed
             - action = actionObject
         */
+
         for (let actionName in actionsToBind) {
             let codes = actionsToBind[actionName].keys;
+
             for (let code of codes) {
                 const obj = this.#bindedActionsByKeyCode[code] = {};
 
@@ -83,7 +86,6 @@ class InputController {
     }
 
     detach() {
-        console.log('detach');
         if(!this.#target) return;
         this.#target.removeEventListener('keydown', this._onKeyDown);
         this.#target.removeEventListener('keyup', this._onKeyUp);
@@ -92,12 +94,10 @@ class InputController {
 
     enableController() {
         this.enabled = true;
-        console.log('enable');
     }
 
     disableController() {
         this.enabled = false;
-        console.log('disable');
     }
 
     enableAction(actionName) {
@@ -114,7 +114,7 @@ class InputController {
 
     isActionActive(actionName){
         const action = this.#bindedActions[actionName];
-        return action && action.isActive;
+        return action && action.enabled && action.isActive;
     }
 
     isKeyPressed(keyCode) {
@@ -123,22 +123,79 @@ class InputController {
     }
 
  
+    _activateAction( action ){
+        if(!action || action.isActive ) return;
+        action.isActive = true;
+        this.#eventBus.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
+            detail: {
+                actionName: action.actionName
+            }
+        }));
+    }
+
+    _deactivateAction( action ){
+        if(!action || !action.isActive ) return;
+        action.isActive = false;
+        this.#eventBus.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
+            detail: {
+                actionName: action.actionName
+            }
+        }));
+    }
+
     // Keyboard
     _onKeyDown(event) {
-        const keyDown = this.#bindedActionsByKeyCode[event.keyCode];
-        if (keyDown) {
-            keyDown.isPressed = true;
+        const keyObject = this.#bindedActionsByKeyCode[event.keyCode];
+        if (keyObject) {
+            keyObject.isPressed = true;
+            this._activateAction(keyObject.action);
         }
-        console.log(`Нажата клавиша ${event.keyCode}`);
+        // console.log(`Нажата клавиша ${event.keyCode}`);
     }
 
     _onKeyUp(event){
-        const keyUp = this.#bindedActionsByKeyCode[event.keyCode];
-        if (keyUp) {
-            keyUp.isPressed = false;
+        const keyObject = this.#bindedActionsByKeyCode[event.keyCode];
+        if (keyObject) {
+            // console.log("Отжата");
+            keyObject.isPressed = false;
+            this._deactivateAction(keyObject.action);
         }
-        console.log("Отжата");
     }
+
+    moveHero(hero, actionName) {
+        let num;
+        switch(actionName){
+            
+            case 'jump':
+                hero.style.transform = `rotate(${Math.random()*360}deg)`;
+                break;
+
+            case 'left':
+                if (hero.style.right === "") num = 3;
+                else num = parseInt(hero.style.right) + 3;
+                hero.style.right = num + 'px';
+                break;
+
+            case 'right':
+                if (hero.style.right === "") num = -3;
+                else num = parseInt(hero.style.right) - 3;
+                hero.style.right = num + 'px';
+                break;
+
+            case 'top':
+                if (hero.style.bottom === "") num = 3;
+                else num = parseInt(hero.style.bottom) + 3;
+                hero.style.bottom = num + 'px';
+                break;
+
+            case 'down':
+                if (hero.style.bottom === "") num = -3;
+                else num = parseInt(hero.style.bottom) - 3;
+                hero.style.bottom = num + 'px';
+                break;
+        }
+    }
+    
 
 }
 

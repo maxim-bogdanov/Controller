@@ -1,27 +1,27 @@
 let actionsToBind = {
     left: {
         keys: [37, 65],
-        enabled: false
+        // enabled: false
     },
     top: {
         keys: [38, 87],
-        enabled: false
+        // enabled: false
     },
     right: {
         keys: [39, 68],
-        enabled: true
+        // enabled: true
     },
     down: {
         keys: [40, 83],
-        enabled: false
+        // enabled: false
     }
-};
-let target = window;
 
+};
+
+let target = window;
+let eventBus = window;
 
 // CONTROLLER INITIALIZATION
-
-// const inputController = new InputController(actionsToBind, target);
 
 const inputController = new InputController();
 inputController.bindActions(actionsToBind);
@@ -69,39 +69,42 @@ addButton( 'байнд доп. активности “прыжок”', 'bindAc
 // HERO MOVEMENT
 const hero = document.getElementsByClassName('hero')[0];
 
-window.addEventListener( InputController.ACTION_ACTIVATED, function(e){
-    console.log('action activated:', e );
-    // проверяем какая активность сработала и применяем к герою
-});
 
-window.addEventListener( InputController.ACTION_DEACTIVATED, function(e){
-    console.log('action deactivated:', e );
-    // проверяем какая активность сработала и применяем к герою
-});
+// eventBus.addEventListener( InputController.ACTION_ACTIVATED, function(e){
+//     console.log('action activated:', e.detail );
+//     inputController.moveHero(hero, e.detail.actionName);
+//     // проверяем какая активность сработала и применяем к герою
+// });
 
-/*
-window.addEventListener('keydown', function(event) {
-    let keyCodeActiveButton = event.keyCode;
-    activeButtons.push(keyCodeActiveButton);
-    console.log(keyCodeActiveButton);
-    console.log(activeButtons);
-});
+// eventBus.addEventListener( InputController.ACTION_DEACTIVATED, function(e){
+//     console.log('action deactivated:', e.detail );
+//     // проверяем какая активность сработала и применяем к герою
+// });
 
-window.addEventListener('keyup', function(event) {
-    let disactiveButton = activeButtons.pop();
-});
-*/
 
 setInterval(function(){
-    
+
+    Object.keys(actionsToBind).forEach(actionName => {
+        if(inputController.isActionActive(actionName)){
+            inputController.moveHero(hero, actionName);
+        }
+    });
+
     // if(inputController.isActionActive ('left')){
     //     // двигаем персонажа влево
-    //     console.log('active');
+    //     inputController.moveHero(hero, 'left');
     // }
     // if(inputController.isActionActive ('right')){
     //     // двигаем персонажа вправо
-    //     console.log('active');
+    //     inputController.moveHero(hero, 'right');
     // }
-    // and so on
+    // if(inputController.isActionActive ('top')){
+    //     // двигаем персонажа вправо
+    //     inputController.moveHero(hero, 'top');
+    // }
+    // if(inputController.isActionActive ('down')){
+    //     // двигаем персонажа вправо
+    //     inputController.moveHero(hero, 'down');
+    // }
 
 }, 33 );
