@@ -9,7 +9,7 @@ let actionsToBind = {
     },
     right: {
         keys: [39, 68],
-        enabled: false
+        enabled: true
     },
     down: {
         keys: [40, 83],
@@ -17,11 +17,15 @@ let actionsToBind = {
     }
 };
 let target = window;
-let activeButtons = [];
 
 
 // CONTROLLER INITIALIZATION
-const inputController = new InputController(actionsToBind, target);
+
+// const inputController = new InputController(actionsToBind, target);
+
+const inputController = new InputController();
+inputController.bindActions(actionsToBind);
+inputController.attach(target);
 
 // BUTTONS
 function addButton( title, className, onClick ){
@@ -75,6 +79,7 @@ window.addEventListener( InputController.ACTION_DEACTIVATED, function(e){
     // проверяем какая активность сработала и применяем к герою
 });
 
+/*
 window.addEventListener('keydown', function(event) {
     let keyCodeActiveButton = event.keyCode;
     activeButtons.push(keyCodeActiveButton);
@@ -85,17 +90,18 @@ window.addEventListener('keydown', function(event) {
 window.addEventListener('keyup', function(event) {
     let disactiveButton = activeButtons.pop();
 });
+*/
 
 setInterval(function(){
     
-    if(inputController.isActionActive ('left')){
-        // двигаем персонажа влево
-        console.log('active');
-    }
-    if(inputController.isActionActive ('right')){
-        // двигаем персонажа вправо
-        console.log('active');
-    }
+    // if(inputController.isActionActive ('left')){
+    //     // двигаем персонажа влево
+    //     console.log('active');
+    // }
+    // if(inputController.isActionActive ('right')){
+    //     // двигаем персонажа вправо
+    //     console.log('active');
+    // }
     // and so on
 
-}, 33.333 );
+}, 33 );
