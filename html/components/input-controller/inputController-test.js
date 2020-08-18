@@ -83,8 +83,8 @@ const hero = document.getElementsByClassName('hero')[0];
 
 
 setInterval(function(){
-
-    Object.keys(actionsToBind).forEach(actionName => {
+    const bindActions = inputController.getBindActions;
+    Object.keys(bindActions).forEach(actionName => {
         if(inputController.isActionActive(actionName)){
             inputController.moveHero(hero, actionName);
         }

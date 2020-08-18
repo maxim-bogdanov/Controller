@@ -161,6 +161,10 @@ class InputController {
             this._deactivateAction(keyObject.action);
         }
     }
+    
+    get getBindActions() {
+        return this.#bindedActions;
+    }
 
     moveHero(hero, actionName) {
         let num;
