@@ -7,8 +7,9 @@ class GesturesInputDevice extends InputDevice{
     _type = 'gestures';
     #target;
     #eventBus = window;
-    // #mouseCoord = [];
-    #mouseStart= {x:0,y:0};
+    // #mouseStart = {x:0,y:0};
+    // #touchStart = {x:0,y:0};
+    #gesturesStart = {x:0,y:0};
 
     // #swipeDirection;
     constructor(){
@@ -41,56 +42,68 @@ class GesturesInputDevice extends InputDevice{
     attach(target){
         this.#target = target;
 
+        this._touchStart = this._touchStart.bind(this);
+        this._touchEnd = this._touchEnd.bind(this);
+
         this._mouseDown = this._mouseDown.bind(this);
         this._mouseUp = this._mouseUp.bind(this);
 
         this.#target.addEventListener('mousedown', this._mouseDown);
         this.#target.addEventListener('mouseup', this._mouseUp);
+
+        this.#target.addEventListener('touchstart', this._touchStart);
+        this.#target.addEventListener('touchend', this._touchEnd);
     }
 
     //
     detach(){
         this.#target.removeEventListener('mousedown', this._mouseDown);
         this.#target.removeEventListener('mouseup', this._mouseUp);
+
+        this.#target.removeEventListener('touchstart', this._touchStart);
+        this.#target.removeEventListener('touchend', this._touchEnd);
+        
         this.#target = undefined;
     }
 
 
     //
-    // isKeyPressed(keyCode) {
-    //     const key = this.#bindedActionsByKeyCode[keyCode];
-    //     if(key) return key.isPressed;
-    // }
+
+    _touchStart(event) {
+        this.#gesturesStart.x = event.changedTouches[0].clientX;
+        this.#gesturesStart.y = event.changedTouches[0].clientY; 
+    }
+
+    _touchEnd(event) {
+        const gesturesEnd = {
+            x: event.changedTouches[0].clientX,
+            y: event.changedTouches[0].clientY
+        };
+        
+        this._gesturesLast(gesturesEnd);
+    }
 
     _mouseDown(event) {
-        // this.#mouseCoord.push(
-        //     {
-        //         x: event.clientX,
-        //         y: event.clientY,
-        //     }
-        // );
-
-        this.#mouseStart.x = event.clientX;
-        this.#mouseStart.y = event.clientY;
-
-        // const mouseObject = this.#bindedActionsBySwipe[this.#swipeDirection];
-        // if (mouseObject) {
-        //     mouseObject.isSwiped = false;
-        //     this.inputController.deactivateAction(mouseObject.action);
-        // }
-
+        this.#gesturesStart.x = event.clientX;
+        this.#gesturesStart.y = event.clientY;
     }
 
     _mouseUp(event) {
 
-        const mouseEnd = {
+        const gesturesEnd = {
             x: event.clientX,
             y: event.clientY
         };
+
+        this._gesturesLast(gesturesEnd);
+        
+    }
+
+    _gesturesLast(gesturesEnd) {
         const moveTreshold = 5;
 
-        const dx = mouseEnd.x - this.#mouseStart.x;
-        const dy = mouseEnd.y - this.#mouseStart.y;
+        const dx = gesturesEnd.x - this.#gesturesStart.x;
+        const dy = gesturesEnd.y - this.#gesturesStart.y;
         const abs_dx = Math.abs(dx);
         const abs_dy = Math.abs(dy);
 
@@ -113,6 +126,6 @@ class GesturesInputDevice extends InputDevice{
 
         this.inputController.activateAction( this.#bindedActionsBySwipe[actionName].action, true );
 
-    }     
+    }
     
 }

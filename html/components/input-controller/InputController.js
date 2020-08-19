@@ -108,11 +108,6 @@ class InputController {
         return this.enabled && action && action.enabled && action.isActive;
     }
 
-    // isKeyPressed(keyCode) {
-    //     const key = this.#bindedActionsByKeyCode[keyCode];
-    //     if(key) return key.isPressed;
-    // }
-
  
     activateAction( action, isOnce ){
         console.log('activateAction', action);
@@ -138,26 +133,5 @@ class InputController {
             }));
         }
     }
-/*
-    //Keyboard
-    _onKeyDown(event) {
-        const keyObject = this.#bindedActionsByKeyCode[event.keyCode];
-        if (keyObject) {
-            keyObject.isPressed = true;
-            this._activateAction(keyObject.action);
-        }
-        // console.log(`Нажата клавиша ${event.keyCode}`);
-    }
-
-    _onKeyUp(event){
-        const keyObject = this.#bindedActionsByKeyCode[event.keyCode];
-        if (keyObject) {
-            // console.log("Отжата");
-            keyObject.isPressed = false;
-            this._deactivateAction(keyObject.action);
-        }
-    }
-*/    
-
 }
 
